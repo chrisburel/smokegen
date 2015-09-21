@@ -208,7 +208,7 @@ void SmokeDataFile::write()
         if (klass.isNameSpace())
             continue;
         
-        QSet<int> indices; // avoid duplicate case values (diamond-shaped inheritance)
+        QMap<int, QString> indices; // avoid duplicate case values (diamond-shaped inheritance)
         
         out << "    case " << iter.value() << ":   //" << iter.key() << "\n";
         out << "      switch(to) {\n";
@@ -219,13 +219,11 @@ void SmokeDataFile::write()
                 int index = classIndex[className];
                 if (indices.contains(index))
                     continue;
-                indices << index;
-                
-                out << QString("        case %1: return (void*)(%2*)(%3*)xptr;\n")
+                indices[index] = QString("        case %1: return (void*)(%2*)(%3*)xptr;\n")
                     .arg(index).arg(className).arg(klass.toString());
             }
         }
-        out << QString("        case %1: return (void*)(%2*)xptr;\n").arg(iter.value()).arg(klass.toString());
+        indices[iter.value()] = QString("        case %1: return (void*)(%2*)xptr;\n").arg(iter.value()).arg(klass.toString());
         foreach (const Class* desc, Util::descendantsList(&klass)) {
             QString className = desc->toString();
             
@@ -233,16 +231,18 @@ void SmokeDataFile::write()
                 int index = classIndex[className];
                 if (indices.contains(index))
                     continue;
-                indices << index;
                 
                 if (Util::isVirtualInheritancePath(desc, &klass)) {
-                    out << QString("        case %1: return (void*)dynamic_cast<%2*>((%3*)xptr);\n")
+                    indices[index] = QString("        case %1: return (void*)dynamic_cast<%2*>((%3*)xptr);\n")
                         .arg(index).arg(className).arg(klass.toString());
                 } else {
-                    out << QString("        case %1: return (void*)(%2*)(%3*)xptr;\n")
+                    indices[index] = QString("        case %1: return (void*)(%2*)(%3*)xptr;\n")
                         .arg(index).arg(className).arg(klass.toString());
                 }
             }
+        }
+        for (QMap<int, QString>::const_iterator it = indices.constBegin(); it != indices.constEnd(); it++) {
+            out << it.value();
         }
         out << "        default: return xptr;\n";
         out << "      }\n";
@@ -302,7 +302,11 @@ void SmokeDataFile::write()
     // xenum functions
     out << "// These are the xenum functions for manipulating enum pointers\n";
     QSet<QString> enumClassesHandled;
+    QMap<QString, Enum> sortedEnums;
     for (QHash<QString, Enum>::const_iterator it = enums.constBegin(); it != enums.constEnd(); it++) {
+        sortedEnums[it.key()] = it.value();
+    }
+    for (QMap<QString, Enum>::const_iterator it = sortedEnums.constBegin(); it != sortedEnums.constEnd(); it++) {
         if (!it.value().isValid())
             continue;
         
