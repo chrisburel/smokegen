@@ -177,12 +177,13 @@ QString Type::toString(const QString& fnPtrName) const
     // FIXME: This won't work for an array of function pointers!
     if (isArray() && (m_pointerDepth > 0 || m_isRef)) ret += '(';
     
+    if (m_pointerDepth || m_isRef) ret += " ";
     for (int i = 0; i < m_pointerDepth; i++) {
         ret += "*";
         if (isConstPointer(i)) ret += " const ";
     }
-    ret = ret.trimmed();
     if (m_isRef) ret += "&";
+    ret = ret.trimmed();
     
     if (isArray()) ret += fnPtrName;
     if (isArray() && (m_pointerDepth > 0 || m_isRef)) ret += ')';
