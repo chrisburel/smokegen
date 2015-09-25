@@ -209,7 +209,7 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
     }
 
     // add all functions as methods to a class called 'QGlobalSpace' or a class that represents a namespace
-    for (QHash<QString, Function>::const_iterator it = functions.constBegin(); it != functions.constEnd(); it++) {
+    for (QMap<QString, Function>::const_iterator it = functions.constBegin(); it != functions.constEnd(); it++) {
         const Function& fn = it.value();
         
         QString fnString = fn.toString();

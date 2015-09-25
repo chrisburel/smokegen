@@ -36,7 +36,7 @@ class Type;
 extern GENERATOR_EXPORT QHash<QString, Class> classes;
 extern GENERATOR_EXPORT QHash<QString, Typedef> typedefs;
 extern GENERATOR_EXPORT QHash<QString, Enum> enums;
-extern GENERATOR_EXPORT QHash<QString, Function> functions;
+extern GENERATOR_EXPORT QMap<QString, Function> functions;
 extern GENERATOR_EXPORT QHash<QString, GlobalVar> globals;
 extern GENERATOR_EXPORT QHash<QString, Type> types;
 
