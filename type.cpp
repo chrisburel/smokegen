@@ -168,7 +168,7 @@ QString Type::toString(const QString& fnPtrName) const
     if (!m_templateArgs.isEmpty()) {
         ret += "<";
         for (int i = 0; i < m_templateArgs.count(); i++) {
-            if (i > 0) ret += ',';
+            if (i > 0) ret += ", ";
             ret += m_templateArgs[i].toString();
         }
         ret += ">";
@@ -193,7 +193,7 @@ QString Type::toString(const QString& fnPtrName) const
     }
     
     if (m_isFunctionPointer) {
-        ret += "(*" + fnPtrName + ")(";
+        ret += " (*" + fnPtrName + ")(";
         for (int i = 0; i < m_params.count(); i++) {
             if (i > 0) ret += ',';
             ret += m_params[i].type()->toString();
