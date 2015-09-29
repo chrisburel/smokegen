@@ -606,7 +606,7 @@ void SmokeDataFile::write()
             out << ", " << (isExternal ? 0 : xcall_index) << "},";
             
             // comment
-            out << "\t//" << i << " " << klass->toString() << "::";
+            out << "\t//" << i << " " << meth.type()->toString() << " " << klass->toString() << "::";
             out << meth.name() << '(';
             for (int j = 0; j < meth.parameters().count(); j++) {
                 if (j > 0) out << ", ";
