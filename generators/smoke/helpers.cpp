@@ -263,6 +263,9 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
     // all enums that don't have a parent are put under QGlobalSpace, too
     for (QHash<QString, Enum>::iterator it = enums.begin(); it != enums.end(); it++) {
         Enum& e = it.value();
+        if (Options::typeExcluded(it.key())) {
+            continue;
+        }
         if (!e.parent()) {
             Class* parent = &globalSpace;
             // if the enum is defined in a namespace, make that the enum's parent
