@@ -403,7 +403,12 @@ public:
           m_pointerDepth(pointerDepth), m_isRef(isRef), m_isIntegral(false), m_isFunctionPointer(false) {}
     Type(const QString& name, bool isConst = false, bool isVolatile = false, int pointerDepth = 0, bool isRef = false)
         : m_class(0), m_typedef(0), m_enum(0), m_name(name), m_isConst(isConst), m_isVolatile(isVolatile), 
-          m_pointerDepth(pointerDepth), m_isRef(isRef), m_isIntegral(false), m_isFunctionPointer(false) {}
+          m_pointerDepth(pointerDepth), m_isRef(isRef), m_isIntegral(false), m_isFunctionPointer(false) {
+        if (m_name.startsWith("signed ") && m_name != "signed char"){
+            m_name.remove(0, 7);
+        }
+        else if (m_name == "size_t") m_name = "unsigned long";
+    }
 
     void setClass(Class* klass) { m_class = klass; m_typedef = 0; m_enum = 0; }
     Class* getClass() const { return m_class; }

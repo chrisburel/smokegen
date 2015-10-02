@@ -391,9 +391,18 @@ void SmokeDataFile::write()
     out << "    { 0, 0, 0 },\t//0 (no type)\n";
     QMap<QString, Type*> sortedTypes;
     for (QSet<Type*>::const_iterator it = usedTypes.constBegin(); it != usedTypes.constEnd(); it++) {
-        QString typeString = (*it)->toString();
+        Type* t = *it;
+        QString typeString = t->toString();
+        if (typeString == "qreal") {
+            t = &types["double"];
+            typeString = "double";
+        }
+        else if (typeString == "qint64") {
+            t = &types["long long"];
+            typeString = "long long";
+        }
         if (!typeString.isEmpty()) {
-            sortedTypes.insert(typeString, *it);
+            sortedTypes.insert(typeString, t);
         }
     }
     
@@ -463,6 +472,14 @@ void SmokeDataFile::write()
             }
             for (int i = 0; i < indices.size(); i++) {
                 Type* t = meth.parameters()[i].type();
+
+                if (t->toString() == "qreal") {
+                    t = &types["double"];
+                }
+                else if (t->toString() == "qint64") {
+                    t = &types["long long"];
+                }
+
                 if (!typeIndex.contains(t)) {
                     qFatal("missing type: %s in method %s (while building munged names map)", qPrintable(t->toString()), qPrintable(meth.toString(false, true)));
                 }
@@ -596,12 +613,19 @@ void SmokeDataFile::write()
 
             flags.replace("0|", "");
             out << flags;
-            if (meth.type() == Type::Void) {
+            Type* t = meth.type();
+            if (t->toString() == "qreal") {
+                t = &types["double"];
+            }
+            else if (t->toString() == "qint64") {
+                t = &types["long long"];
+            }
+            if (t == Type::Void) {
                 out << ", 0";
-            } else if (!typeIndex.contains(meth.type())) {
+            } else if (!typeIndex.contains(t)) {
                 qFatal("missing type: %s in method %s (while writing out methods table)", qPrintable(meth.type()->toString()), qPrintable(meth.toString(false, true)));
             } else {
-                out << ", " << typeIndex[meth.type()];
+                out << ", " << typeIndex[t];
             }
             out << ", " << (isExternal ? 0 : xcall_index) << "},";
             

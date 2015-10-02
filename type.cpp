@@ -193,9 +193,10 @@ QString Type::toString(const QString& fnPtrName) const
     }
     
     if (m_isFunctionPointer) {
-        ret += " (*" + fnPtrName + ")(";
+        if (!(m_pointerDepth || m_isRef)) ret += " ";
+        ret += "(*" + fnPtrName + ")(";
         for (int i = 0; i < m_params.count(); i++) {
-            if (i > 0) ret += ',';
+            if (i > 0) ret += ", ";
             ret += m_params[i].type()->toString();
         }
         ret += ')';
