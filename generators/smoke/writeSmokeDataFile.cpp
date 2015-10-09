@@ -432,7 +432,7 @@ void SmokeDataFile::write()
     out << "static Smoke::Index argumentList[] = {\n";
     out << "    0,\t//0  (void)\n";
     
-    QHash<QVector<int>, int> parameterList;
+    std::map<std::vector<int>, std::vector<const Method*> > parameterList;
     QHash<const Method*, int> parameterIndices;
     
     // munged name => index
@@ -440,7 +440,6 @@ void SmokeDataFile::write()
     // class => list of munged names with possible methods or enum members
     QHash<const Class*, QMap<QString, QList<const Member*> > > classMungedNames;
     
-    currentIdx = 1;
     for (QMap<QString, int>::const_iterator iter = classIndex.constBegin(); iter != classIndex.constEnd(); iter++) {
         Class* klass = &classes[iter.key()];
         bool isExternal = externalClasses.contains(klass);
@@ -465,8 +464,7 @@ void SmokeDataFile::write()
                 parameterIndices[&meth] = 0;
                 continue;
             }
-            QVector<int> indices(meth.parameters().count());
-            QStringList comment;
+            std::vector<int> indices(meth.parameters().count());
             if (meth.parameters().size() > 0) {
                 outArgNames << klass->name() << "," << meth.name();
             }
@@ -485,7 +483,6 @@ void SmokeDataFile::write()
                 }
                 outArgNames << ",";
                 outArgNames << (indices[i] = typeIndex[t]);
-                comment << t->toString();
             }
             if (meth.parameters().size() > 0) {
                 outArgNames << ";";
@@ -505,19 +502,7 @@ void SmokeDataFile::write()
                 }
                 outArgNames << "\n";
             }
-            int idx = 0;
-            if ((idx = parameterList.value(indices, -1)) == -1) {
-                idx = currentIdx;
-                parameterList[indices] = idx;
-                out << "    ";
-                for (int i = 0; i < indices.count(); i++) {
-                    if (i > 0) out << ", ";
-                    out << indices[i];
-                }
-                out << ", 0,\t//" << idx << "  " << comment.join(", ") << "\n";
-                currentIdx += indices.count() + 1;
-            }
-            parameterIndices[&meth] = idx;
+            parameterList[indices].push_back(&meth);
         }
         foreach (BasicTypeDeclaration* decl, klass->children()) {
             const Enum* e = 0;
@@ -525,6 +510,9 @@ void SmokeDataFile::write()
                 if (e->access() == Access_private)
                     continue;
                 foreach (const EnumMember& member, e->members()) {
+                    if (Options::typeExcluded(member.toString())) {
+                        continue;
+                    }
                     methodNames[member.name()] = 1;
                     map[member.name()].append(&member);
                 }
@@ -532,6 +520,41 @@ void SmokeDataFile::write()
         }
     }
     
+    currentIdx = 1;
+    for (std::map<std::vector<int>, std::vector<const Method*> >::const_iterator it = parameterList.begin();
+            it != parameterList.end();
+            ++it) {
+        const std::vector<int>& indices = it->first;
+        const std::vector<const Method*>& methods = it->second;
+
+        out << "    ";
+        for (int i = 0; i < indices.size(); i++) {
+            if (i > 0) out << ", ";
+            out << indices[i];
+        }
+
+        QStringList comment;
+        for (int paramNum = 0; paramNum < methods[0]->parameters().size(); ++paramNum) {
+            Type* t = methods[0]->parameters()[paramNum].type();
+
+            if (t->toString() == "qreal") {
+                t = &types["double"];
+            }
+            else if (t->toString() == "qint64") {
+                t = &types["long long"];
+            }
+            comment << t->toString();
+        }
+
+        out << ", 0,\t//" << currentIdx << "  " << comment.join(", ") << "\t" << methods[0]->toString(false, true) << "\n";
+        for (std::vector<const Method*>::const_iterator methodIt = methods.begin();
+                methodIt != methods.end();
+                ++methodIt) {
+            parameterIndices[*methodIt] = currentIdx;
+        }
+
+        currentIdx += indices.size() + 1;
+    }
     out << "};\n\n";
     
     out << "// Raw list of all methods, using munged names\n";
