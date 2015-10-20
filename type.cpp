@@ -234,14 +234,14 @@ QDebug operator<<(QDebug debug, Class::Kind kind) {
 }
 
 QDebug operator<<(QDebug debug, Class::BaseClassSpecifier baseClass) {
-    debug << baseClass.baseClass->name() << ' ' << baseClass.access << ' ' << baseClass.isVirtual;
+    debug << baseClass.baseClass->toString() << ' ' << baseClass.access << ' ' << baseClass.isVirtual;
     return debug;
 }
 
 QDebug operator<<(QDebug debug, BasicTypeDeclaration klass) {
-    debug << klass.name() <<
+    debug << klass.toString() <<
     klass.nameSpace() <<
-    (klass.parent() ? klass.parent()->name() : "") <<
+    (klass.parent() ? klass.parent()->toString() : "") <<
     klass.access();
     return debug;
 }
@@ -258,7 +258,7 @@ QDebug operator<<(QDebug debug, Class klass) {
 
 QDebug operator<<(QDebug debug, Typedef tdef) {
     debug << (BasicTypeDeclaration)tdef <<
-        tdef.type()->name();
+        tdef.type()->toString();
     return debug;
 }
 
