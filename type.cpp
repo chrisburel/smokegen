@@ -266,14 +266,14 @@ QDebug operator<<(QDebug debug, Class klass) {
 }
 
 QDebug operator<<(QDebug debug, Method method) {
-    debug << (Member)method << ' ' <<
+    debug << (Member)method <<
         method.parameters();
     return debug;
 }
 
 QDebug operator<<(QDebug debug, Typedef tdef) {
     debug << (BasicTypeDeclaration)tdef <<
-        tdef.type()->toString();
+        '[' << *tdef.type() << ']';
     return debug;
 }
 
@@ -297,8 +297,14 @@ QDebug operator<<(QDebug debug, Member::Flags flags) {
 }
 
 QDebug operator<<(QDebug debug, Member member) {
+    QString retTypeStr;
+    QDebug retType(&retTypeStr);
+    if (member.type()) {
+        retType << *member.type();
+    }
+
     debug << member.name() << ' ' <<
-        (member.type() ? member.type()->name() : "") << ' ' <<
+        retTypeStr << ' ' <<
         member.declaringType()->name() << ' ' <<
         member.access() << ' ' <<
         member.flags();
@@ -319,20 +325,21 @@ QDebug operator<<(QDebug debug, Enum e) {
 
 QDebug operator<<(QDebug debug, GlobalVar var) {
     debug << var.qualifiedName() <<
-        var.type()->name();
+        *var.type();
     return debug;
 }
 
 QDebug operator<<(QDebug debug, Parameter parameter) {
     debug << parameter.name() << ' ' <<
-        parameter.type()->name() << ' ' <<
+        *parameter.type() << ' ' <<
         parameter.defaultValue();
     return debug;
 }
 
 QDebug operator<<(QDebug debug, Function function) {
     debug << (GlobalVar)function <<
-        function.parameters();
+        function.parameters() <<
+        function.toString();
     return debug;
 }
 
