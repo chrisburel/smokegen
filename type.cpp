@@ -252,7 +252,22 @@ QDebug operator<<(QDebug debug, Class klass) {
     klass.isForwardDecl() <<
     klass.isNameSpace() <<
     klass.baseClasses() <<
-    klass.isTemplate();
+    klass.isTemplate() << "\n";
+
+    std::map<QString, Method> sortedMethods;
+    foreach (const Method& method, klass.methods()) {
+        QString key = method.name();
+        sortedMethods[key] = method;
+    }
+    for (const std::pair<const QString, Method>& item : sortedMethods) {
+        debug << "        " << item.second << "\n";
+    }
+    return debug;
+}
+
+QDebug operator<<(QDebug debug, Method method) {
+    debug << (Member)method << ' ' <<
+        method.parameters();
     return debug;
 }
 

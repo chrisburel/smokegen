@@ -502,6 +502,8 @@ QDebug operator<<(QDebug debug, Class::Kind kind);
 QDebug operator<<(QDebug debug, Class::BaseClassSpecifier baseClasses);
 QDebug operator<<(QDebug debug, BasicTypeDeclaration klass);
 QDebug operator<<(QDebug debug, Class klass);
+QDebug operator<<(QDebug debug, Member member);
+QDebug operator<<(QDebug debug, Method method);
 QDebug operator<<(QDebug debug, Typedef tdef);
 QDebug operator<<(QDebug debug, EnumMember e);
 QDebug operator<<(QDebug debug, Enum e);
