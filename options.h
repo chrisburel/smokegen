@@ -37,6 +37,7 @@ struct GENERATOR_EXPORT ParserOptions
     static QFileInfo definesList;
     static QList<QFileInfo> headerList;
     static QList<QDir> includeDirs;
+    static QList<QDir> frameworkDirs;
     static bool resolveTypedefs;
     static QList<QString> notToBeResolved;
     static bool qtMode;

@@ -148,6 +148,9 @@ int main(int argc, char **argv)
                     if (elem.tagName() == "dir") {
                         ParserOptions::includeDirs << QDir(elem.text());
                     }
+                    else if (elem.tagName() == "framework") {
+                        ParserOptions::frameworkDirs << QDir(elem.text());
+                    }
                     dir = dir.nextSibling();
                 }
             } else if (elem.tagName() == "definesList") {
@@ -227,6 +230,10 @@ int main(int argc, char **argv)
 
         foreach (QDir dir, ParserOptions::includeDirs) {
             Argv.push_back("-I" + dir.path().toStdString());
+        }
+        foreach (QDir dir, ParserOptions::frameworkDirs) {
+            Argv.push_back("-iframework");
+            Argv.push_back(dir.path().toStdString());
         }
         foreach (QString define, defines) {
             Argv.push_back("-D" + define.toStdString());
