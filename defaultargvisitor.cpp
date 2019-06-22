@@ -14,7 +14,7 @@ bool DefaultArgVisitor::VisitDeclRefExpr(clang::DeclRefExpr* D) {
 
         if (enumStr.compare(0, prefix.length(), prefix)) {
             rewriter.InsertText(
-                rewriter.getSourceMgr().getFileLoc(D->getLocStart()),
+                rewriter.getSourceMgr().getFileLoc(D->getBeginLoc()),
                 prefix,
                 true,
                 true
@@ -29,8 +29,8 @@ std::string DefaultArgVisitor::toString(const clang::Expr* D) const {
         return std::string();
     }
 
-    clang::SourceLocation startLoc = rewriter.getSourceMgr().getFileLoc(D->getLocStart());
-    clang::SourceLocation endLoc = rewriter.getSourceMgr().getFileLoc(D->getLocEnd());
+    clang::SourceLocation startLoc = rewriter.getSourceMgr().getFileLoc(D->getBeginLoc());
+    clang::SourceLocation endLoc = rewriter.getSourceMgr().getFileLoc(D->getEndLoc());
     clang::SourceRange expandedLoc(startLoc, endLoc);
     return rewriter.getRewrittenText(expandedLoc);
 }
