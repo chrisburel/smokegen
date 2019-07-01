@@ -2,12 +2,15 @@ static const char Injected[] = R"-(
 #if defined(Q_MOC_OUTPUT_REVISION) || defined(Q_MOC_RUN)
 
 #ifdef Q_COMPILER_VARIADIC_MACROS
+#undef QT_ANNOTATE_CLASS
 #define QT_ANNOTATE_CLASS(type, ...) \
     __extension__ _Static_assert(sizeof (#__VA_ARGS__), #type);
 #else
+#undef QT_ANNOTATE_CLASS
 #define QT_ANNOTATE_CLASS(type, anotation) \
     __extension__ _Static_assert(sizeof (#anotation), #type);
 #endif
+#undef QT_ANNOTATE_CLASS2
 #define QT_ANNOTATE_CLASS2(type, a1, a2) \
     __extension__ _Static_assert(sizeof (#a1, #a2), #type);
 
