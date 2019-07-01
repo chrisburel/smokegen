@@ -72,9 +72,11 @@ void SmokeClassFiles::write(const QList<QString>& keys)
         // ... and the #includes
         QList<QString> sortedIncludes = includes.toList();
         qSort(sortedIncludes.begin(), sortedIncludes.end());
-        foreach (const QString& str, sortedIncludes) {
+        for (QString& str : sortedIncludes) {
             if (str.isEmpty())
                 continue;
+            if (str.startsWith("/builtins/"))
+                str.remove(0, 10);
             fileOut << "#include <" << str << ">\n";
         }
 
