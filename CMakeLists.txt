@@ -41,30 +41,16 @@ set(generator_SRC
     type.cpp
 )
 
-# force RPATH so that the binary is usable from within the build tree
-set (CMAKE_SKIP_BUILD_RPATH FALSE)
-set (CMAKE_SKIP_RPATH FALSE)
+# add the automatically determined parts of the RPATH
+# which point to directories outside the build tree to the install RPATH
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_MACOSX_RPATH 1)
+
 # the RPATH to be used when installing, but only if it's not a system directory
 LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 ENDIF("${isSystemDir}" STREQUAL "-1")
-
-get_target_property(QtCore_location Qt5::Core LOCATION)
-GET_FILENAME_COMPONENT(QtCore_lib_dir ${QtCore_location} PATH)
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${QtCore_lib_dir} isSystemDir)
-IF("${isSystemDir}" STREQUAL "-1")
-    SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${QtCore_lib_dir}")
-ENDIF("${isSystemDir}" STREQUAL "-1")
-
-if(TARGET LLVM)
-    get_target_property(llvm_location LLVM LOCATION)
-    GET_FILENAME_COMPONENT(llvm_lib_dir ${llvm_location} PATH)
-    LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES ${llvm_lib_dir} isSystemDir)
-    IF("${isSystemDir}" STREQUAL "-1")
-        SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_RPATH}:${llvm_lib_dir}")
-    ENDIF("${isSystemDir}" STREQUAL "-1")
-endif()
 
 configure_file( ${CMAKE_CURRENT_SOURCE_DIR}/config.h.in config.h @ONLY )
 
