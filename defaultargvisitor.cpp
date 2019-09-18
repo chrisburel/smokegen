@@ -10,15 +10,18 @@ bool DefaultArgVisitor::VisitDeclRefExpr(clang::DeclRefExpr* D) {
         D->printPretty(s, nullptr, pp());
         s.flush();
 
-        std::string prefix = clang::cast<clang::NamedDecl>(enumConstant->getDeclContext()->getParent())->getQualifiedNameAsString() + "::";
+        clang::NamedDecl *parent = clang::dyn_cast<clang::NamedDecl>(enumConstant->getDeclContext()->getParent());
 
-        if (enumStr.compare(0, prefix.length(), prefix)) {
-            rewriter.InsertText(
-                rewriter.getSourceMgr().getFileLoc(D->getBeginLoc()),
-                prefix,
-                true,
-                true
-            );
+        if ( parent ) {
+          std::string prefix = parent ->getQualifiedNameAsString() + "::";
+          if (enumStr.compare(0, prefix.length(), prefix)) {
+              rewriter.InsertText(
+                  rewriter.getSourceMgr().getFileLoc(D->getBeginLoc()),
+                  prefix,
+                  true,
+                  true
+              );
+          }
         }
     }
     return true;
