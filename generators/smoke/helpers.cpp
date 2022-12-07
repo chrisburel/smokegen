@@ -30,7 +30,7 @@
 #include "globals.h"
 #include "../../options.h"
 
-typedef void (*InitSmokeFn)();
+using InitSmokeFn = void (*)();
 
 QHash<QString, QString> Util::typeMap;
 QHash<const Method*, const Function*> Util::globalFunctionMap;

@@ -22,7 +22,7 @@
 
 #include <smoke.h>
 
-typedef void (*InitSmokeFn)();
+using InitSmokeFn = void (*)();
 
 Smoke* loadSmokeModule(QFileInfo file) {
     QLibrary lib(file.filePath());

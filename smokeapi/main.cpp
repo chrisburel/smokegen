@@ -25,8 +25,8 @@
 
 static QTextStream qOut(stdout);
 
-typedef void (*InitSmokeFn)();
-typedef QPair<Smoke::ModuleIndex,int> ClassEntry;
+using InitSmokeFn = void (*)();
+using ClassEntry = QPair<Smoke::ModuleIndex, int>;
 
 static QList<Smoke*> smokeModules;
 

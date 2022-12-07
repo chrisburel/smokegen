@@ -276,7 +276,7 @@ protected:
     QString m_defaultValue;
 };
 
-typedef QList<Parameter> ParameterList;
+using ParameterList = QList<Parameter>;
 
 class GENERATOR_EXPORT Method : public Member
 {

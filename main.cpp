@@ -41,7 +41,7 @@
 #include "embedded_includes.h"
 
 
-typedef int (*GenerateFn)();
+using GenerateFn = int (*)();
 
 static void showUsage()
 {

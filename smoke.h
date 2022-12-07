@@ -74,7 +74,7 @@ public:
     /**
      * A stack is an array of arguments, passed to a method when calling it.
      */
-    typedef StackItem* Stack;
+    using Stack = StackItem *;
 
     enum EnumOperation {
 	EnumNew,
@@ -83,10 +83,10 @@ public:
 	EnumToLong
     };
 
-    typedef short Index;
-    typedef void (*ClassFn)(Index method, void* obj, Stack args);
-    typedef void* (*CastFn)(void* obj, Index from, Index to);
-    typedef void (*EnumFn)(EnumOperation, Index, void*&, long&);
+    using Index = short;
+    using ClassFn = void (*)(Index, void *, Stack);
+    using CastFn = void *(*)(void *, Index, Index);
+    using EnumFn = void (*)(EnumOperation, Index, void *&, long &);
 
     /**
      * Describe one index in a given module.
@@ -110,7 +110,7 @@ public:
      */
     static ModuleIndex NullModuleIndex; 
     
-    typedef std::map<std::string, ModuleIndex> ClassMap;
+    using ClassMap = std::map<std::string, ModuleIndex>;
     static ClassMap classMap;
 
     enum ClassFlags {
