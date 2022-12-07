@@ -28,7 +28,11 @@
 #include <QtDebug>
 
 #include <iostream>
+#include <memory>
 
+#include <llvm/ADT/IntrusiveRefCntPtr.h>
+#include <llvm/Support/MemoryBuffer.h>
+#include <llvm/Support/VirtualFileSystem.h>
 #include <clang/Tooling/Tooling.h>
 
 #include "options.h"
@@ -242,16 +246,17 @@ int main(int argc, char **argv)
         Argv.push_back("-I/builtins");
         Argv.push_back("-fsyntax-only");
 
-        clang::FileManager FM({"."});
+        llvm::IntrusiveRefCntPtr<llvm::vfs::OverlayFileSystem> overlayFS{new llvm::vfs::OverlayFileSystem(llvm::vfs::getRealFileSystem())};
+        llvm::IntrusiveRefCntPtr<llvm::vfs::InMemoryFileSystem> inMemoryFS{new llvm::vfs::InMemoryFileSystem()};
+        overlayFS->pushOverlay(inMemoryFS);
+
+        for (const EmbeddedFile& file : EmbeddedFiles) {
+            inMemoryFS->addFile(file.filename, 0, llvm::MemoryBuffer::getMemBuffer({file.content, file.size}));
+        }
+        clang::FileManager FM({"."}, overlayFS);
         FM.Retain();
 
         clang::tooling::ToolInvocation inv(Argv, new SmokegenFrontendAction, &FM);
-
-        const EmbeddedFile* f = EmbeddedFiles;
-        while (f->filename) {
-            inv.mapVirtualFile(f->filename, {f->content, f->size});
-            ++f;
-        }
 
         if (!inv.run()) {
             return 1;

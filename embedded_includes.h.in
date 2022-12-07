@@ -17,7 +17,6 @@ struct EmbeddedFile {
 
 static constexpr EmbeddedFile EmbeddedFiles[] = {
     @EMBEDDED_DATA@
-    {}
 };
 
 #endif
