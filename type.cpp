@@ -189,7 +189,7 @@ QString Type::toString(const QString& fnPtrName) const
     if (isArray()) ret += fnPtrName;
     if (isArray() && (m_pointerDepth > 0 || m_isRef)) ret += ')';
     
-    foreach(int size, m_arrayLengths) {
+    for (int size : m_arrayLengths) {
         ret += '[' + QString::number(size) + ']';
     }
     

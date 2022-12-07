@@ -436,13 +436,13 @@ void SmokeClassFiles::writeClass(QTextStream& out, const Class* klass, const QSt
     QTextStream enumOut(&enumCode);
     const Enum* e = 0;
     bool enumFound = false;
-    foreach (const BasicTypeDeclaration* decl, klass->children()) {
+    for (const BasicTypeDeclaration* decl : klass->children()) {
         if (!(e = dynamic_cast<const Enum*>(decl)))
             continue;
         if (e->access() == Access_private)
             continue;
         
-        foreach (const EnumMember& member, e->members()) {
+        for (const EnumMember& member : e->members()) {
             switchOut << "        case " << xcall_index << ": " << smokeClassName <<  "::x_" << xcall_index << "(args);\tbreak;\n";
             if (e->parent())
                 generateEnumMemberCall(out, className, e->name(), e->isScoped(), member.name(), xcall_index++);

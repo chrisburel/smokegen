@@ -204,7 +204,7 @@ int main(int argc, char **argv)
         return EXIT_FAILURE;
     }
     
-    foreach (QDir dir, ParserOptions::includeDirs) {
+    for (QDir dir : ParserOptions::includeDirs) {
         if (!dir.exists()) {
             qWarning() << "include directory" << dir.path() << "doesn't exist";
             ParserOptions::includeDirs.removeAll(dir);
@@ -229,17 +229,17 @@ int main(int argc, char **argv)
     bool logErrors = log.open(QFile::WriteOnly | QFile::Truncate);
     QTextStream logOut(&log);
     
-    foreach (QFileInfo file, ParserOptions::headerList) {
+    for (QFileInfo file : ParserOptions::headerList) {
         qDebug() << "parsing" << file.absoluteFilePath();
 
-        foreach (QDir dir, ParserOptions::includeDirs) {
+        for (QDir dir : ParserOptions::includeDirs) {
             Argv.push_back("-I" + dir.path().toStdString());
         }
-        foreach (QDir dir, ParserOptions::frameworkDirs) {
+        for (QDir dir : ParserOptions::frameworkDirs) {
             Argv.push_back("-iframework");
             Argv.push_back(dir.path().toStdString());
         }
-        foreach (QString define, defines) {
+        for (QString define : defines) {
             Argv.push_back("-D" + define.toStdString());
         }
         Argv.push_back(file.absoluteFilePath().toStdString());

@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 
     for (QHash<Smoke*, QSet<Smoke*> >::iterator iter = parents.begin(); iter != parents.end(); iter++) {
         // remove dependencies that are already covered by other parent modules
-        foreach (Smoke* smoke, iter.value()) {
+        for (Smoke* smoke : iter.value()) {
             iter.value() -= parents[smoke];
         }
     }
@@ -110,18 +110,18 @@ int main(int argc, char** argv)
 
         if (generateXml) {
             qOut << "    <parentModules>" << endl;
-            foreach (Smoke* parent, sortedList) {
+            for (Smoke* parent : sortedList) {
                 qOut << "        <module>" << parent->moduleName() << "</module>" << endl;
             }
             qOut << "    </parentModules>" << endl;
         } else {
-            foreach (Smoke* parent, sortedList) {
+            for (Smoke* parent : sortedList) {
                 qOut << "  * " << parent->moduleName() << endl;
             }
         }
     }
 
-    foreach (Smoke* smoke, parents.keys())
+    for (Smoke* smoke : parents.keys())
         delete smoke;
 
     return 0;

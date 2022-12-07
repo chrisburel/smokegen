@@ -39,7 +39,7 @@ QHash<const Method*, const Field*> Util::fieldAccessors;
 // looks up the inheritance path from desc to super and sets 'virt' to true if it encounters a virtual base
 static bool isVirtualInheritancePathPrivate(const Class* desc, const Class* super, bool *virt)
 {
-    foreach (const Class::BaseClassSpecifier bspec, desc->baseClasses()) {
+    for (const Class::BaseClassSpecifier bspec : desc->baseClasses()) {
         if (bspec.baseClass == super || isVirtualInheritancePathPrivate(bspec.baseClass, super, virt)) {
             if (bspec.isVirtual)
                 *virt = true;
@@ -63,7 +63,7 @@ QList<const Class*> Util::superClassList(const Class* klass)
     QList<const Class*> ret;
     if (superClassCache.contains(klass))
         return superClassCache[klass];
-    foreach (const Class::BaseClassSpecifier& base, klass->baseClasses()) {
+    for (const Class::BaseClassSpecifier& base : klass->baseClasses()) {
         ret << base.baseClass;
         ret += superClassList(base.baseClass);
     }
@@ -156,7 +156,7 @@ static bool compareArgs(const Method& method, const Smoke::Method& smokeMethod, 
 
 static bool isRepeating(const QList<Smoke*>& parentModules, const char* className, const Method& method) {
     QString mungedName = Util::mungedName(method).toLatin1();
-    foreach (Smoke* smoke, parentModules) {
+    for (Smoke* smoke : parentModules) {
         Smoke::ModuleIndex methodIndex = smoke->findMethod(className, mungedName.toLatin1().constData());
         if (methodIndex.index) {
             Smoke::Index index = methodIndex.smoke->methodMaps[methodIndex.index].method;
@@ -201,7 +201,7 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
     globalSpace.setIsNameSpace(true);
 
     QList<Smoke*> parentModules;
-    foreach (QString module, Options::parentModules) {
+    for (QString module : Options::parentModules) {
         Smoke *smoke = loadSmokeModule(module);
         if (smoke) {
             parentModules << smoke;
@@ -256,7 +256,7 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
             globalFunctionMap[&parent->methods()[i]] = &fn;
 
         (*usedTypes) << meth.type();
-        foreach (const Parameter& param, meth.parameters())
+        for (const Parameter& param : meth.parameters())
             (*usedTypes) << param.type();
     }
 
@@ -297,13 +297,13 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
         }
     }
 
-    foreach (Smoke* smoke, parentModules) {
+    for (Smoke* smoke : parentModules) {
         delete smoke;
     }
 
-    foreach (const QString& key, keys) {
+    for (const QString& key : keys) {
         Class& klass = classes[key];
-        foreach (const Class::BaseClassSpecifier base, klass.baseClasses()) {
+        for (const Class::BaseClassSpecifier base : klass.baseClasses()) {
             superClasses->insert(base.baseClass);
         }
         if (!klass.isNameSpace()) {
@@ -311,7 +311,7 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
             addCopyConstructor(&klass);
             addDestructor(&klass);
             checkForAbstractClass(&klass);
-            foreach (const Method& m, klass.methods()) {
+            for (const Method& m : klass.methods()) {
                 if (m.access() == Access_private)
                     continue;
                 if (hasTypeNonPublicParts(*m.type())
@@ -322,7 +322,7 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
                 }
                 addOverloads(m);
                 (*usedTypes) << m.type();
-                foreach (const Parameter& param, m.parameters()) {
+                for (const Parameter& param : m.parameters()) {
                     (*usedTypes) << param.type();
 
                     if (m.isSlot() || m.isSignal() || m.isQPropertyAccessor()) {
@@ -330,7 +330,7 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
                     }
                 }
             }
-            foreach (const Field& f, klass.fields()) {
+            for (const Field& f : klass.fields()) {
                 if (f.access() == Access_private)
                     continue;
                 if (Options::typeExcluded(f.toString(false, true))) {
@@ -338,13 +338,13 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
                     continue;
                 }
             }
-            foreach (const Field& f, klass.fields()) {
+            for (const Field& f : klass.fields()) {
                 if (f.access() == Access_private)
                     continue;
                 addAccessorMethods(f, usedTypes);
             }
         }
-        foreach (BasicTypeDeclaration* decl, klass.children()) {
+        for (BasicTypeDeclaration* decl : klass.children()) {
             Enum* e = 0;
             if ((e = dynamic_cast<Enum*>(decl))) {
                 Type *t = 0;
@@ -357,7 +357,7 @@ void Util::preparse(QSet<Type*> *usedTypes, QSet<const Class*> *superClasses, co
                     t = Type::registerType(Type(e));
                 }
                 (*usedTypes) << t;
-                foreach (const EnumMember& member, e->members()) {
+                for (const EnumMember& member : e->members()) {
                     if (Options::typeExcluded(member.toString())) {
                         e->membersRef().removeOne(member);
                     }
@@ -376,7 +376,7 @@ bool Util::canClassBeInstanciated(const Class* klass)
         return cache[klass];
     
     bool ctorFound = false, publicCtorFound = false, privatePureVirtualsFound = false;
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if (meth.isConstructor()) {
             ctorFound = true;
             if (meth.access() != Access_private) {
@@ -403,7 +403,7 @@ bool Util::canClassBeCopied(const Class* klass)
         return cache[klass];
 
     bool privateCopyCtorFound = false;
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if (meth.access() != Access_private)
             continue;
         if (meth.isConstructor() && meth.parameters().count() == 1) {
@@ -417,7 +417,7 @@ bool Util::canClassBeCopied(const Class* klass)
     }
     
     bool parentCanBeCopied = true;
-    foreach (const Class::BaseClassSpecifier& base, klass->baseClasses()) {
+    for (const Class::BaseClassSpecifier& base : klass->baseClasses()) {
         if (!canClassBeCopied(base.baseClass)) {
             parentCanBeCopied = false;
             break;
@@ -437,7 +437,7 @@ bool Util::hasClassVirtualDestructor(const Class* klass)
         return cache[klass];
 
     bool virtualDtorFound = false;
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if (meth.isDestructor() && meth.flags() & Method::Virtual) {
             virtualDtorFound = true;
             break;
@@ -445,7 +445,7 @@ bool Util::hasClassVirtualDestructor(const Class* klass)
     }
     
     bool superClassHasVirtualDtor = false;
-    foreach (const Class::BaseClassSpecifier& bspec, klass->baseClasses()) {
+    for (const Class::BaseClassSpecifier& bspec : klass->baseClasses()) {
         if (hasClassVirtualDestructor(bspec.baseClass)) {
             superClassHasVirtualDtor = true;
             break;
@@ -470,7 +470,7 @@ bool Util::hasClassPublicDestructor(const Class* klass)
     }
 
     bool publicDtorFound = true;
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if (meth.isDestructor()) {
             if (meth.access() != Access_public)
                 publicDtorFound = false;
@@ -485,13 +485,13 @@ bool Util::hasClassPublicDestructor(const Class* klass)
 
 const Method* Util::findDestructor(const Class* klass)
 {
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if (meth.isDestructor()) {
             return &meth;
         }
     }
     const Method* dtor = 0;
-    foreach (const Class::BaseClassSpecifier& bspec, klass->baseClasses()) {
+    for (const Class::BaseClassSpecifier& bspec : klass->baseClasses()) {
         if ((dtor = findDestructor(bspec.baseClass))) {
             return dtor;
         }
@@ -504,7 +504,7 @@ void Util::checkForAbstractClass(Class* klass)
     QList<const Method*> list;
     
     bool hasPrivatePureVirtuals = false;
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if ((meth.flags() & Method::PureVirtual) && meth.access() == Access_private)
             hasPrivatePureVirtuals = true;
         if (meth.isConstructor())
@@ -513,7 +513,7 @@ void Util::checkForAbstractClass(Class* klass)
     
     // abstract classes can't be instanstiated - remove the constructors
     if (hasPrivatePureVirtuals) {
-        foreach (const Method* ctor, list) {
+        for (const Method* ctor : list) {
             klass->methodsRef().removeOne(*ctor);
         }
     }
@@ -521,7 +521,7 @@ void Util::checkForAbstractClass(Class* klass)
 
 void Util::addDefaultConstructor(Class* klass)
 {
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         // if the class already has a constructor or if it has pure virtuals, there's nothing to do for us
         if (meth.isConstructor())
             return;
@@ -538,7 +538,7 @@ void Util::addDefaultConstructor(Class* klass)
 
 void Util::addCopyConstructor(Class* klass)
 {
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if (meth.isConstructor() && meth.parameters().count() == 1) {
             const Type* type = meth.parameters()[0].type();
             // found a copy c'tor? then there's nothing to do
@@ -551,7 +551,7 @@ void Util::addCopyConstructor(Class* klass)
     }
     
     // if the parent can't be copied, a copy c'tor is of no use
-    foreach (const Class::BaseClassSpecifier& base, klass->baseClasses()) {
+    for (const Class::BaseClassSpecifier& base : klass->baseClasses()) {
         if (!canClassBeCopied(base.baseClass))
             return;
     }
@@ -568,7 +568,7 @@ void Util::addCopyConstructor(Class* klass)
 
 void Util::addDestructor(Class* klass)
 {
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         // we already have a destructor
         if (meth.isDestructor())
             return;
@@ -580,7 +580,7 @@ void Util::addDestructor(Class* klass)
     const Method* dtor = findDestructor(klass);
     if (dtor && dtor->hasExceptionSpec()) {
         meth.setHasExceptionSpec(true);
-        foreach (const Type& t, dtor->exceptionTypes()) {
+        for (const Type& t : dtor->exceptionTypes()) {
             meth.appendExceptionType(t);
         }
     }
@@ -619,7 +619,7 @@ QChar Util::munge(const Type *type) {
 
 QString Util::mungedName(const Method& meth) {
     QString ret = meth.name();
-    foreach (const Parameter& param, meth.parameters()) {
+    for (const Parameter& param : meth.parameters()) {
         const Type* type = param.type();
         ret += munge(type);
    }
@@ -646,7 +646,7 @@ bool Util::hasTypeNonPublicParts(const Type& type)
         return true;
     }
 
-    foreach (const Type& t, type.templateArguments()) {
+    for (const Type& t : type.templateArguments()) {
         if (hasTypeNonPublicParts(t)) {
             return true;
         }
@@ -721,14 +721,14 @@ QString Util::assignmentString(const Type* type, const QString& var)
 QList<const Method*> Util::collectVirtualMethods(const Class* klass)
 {
     QList<const Method*> methods;
-    foreach (const Method& meth, klass->methods()) {
+    for (const Method& meth : klass->methods()) {
         if ((meth.flags() & Method::Virtual || meth.flags() & Method::PureVirtual)
             && !meth.isDestructor() && meth.access() != Access_private)
         {
             methods << &meth;
         }
     }
-    foreach (const Class::BaseClassSpecifier& baseClass, klass->baseClasses()) {
+    for (const Class::BaseClassSpecifier& baseClass : klass->baseClasses()) {
         methods += collectVirtualMethods(baseClass.baseClass);
     }
     return methods;
@@ -847,13 +847,13 @@ const Method* Util::isVirtualOverriden(const Method& meth, const Class* klass)
     if (meth.getClass() == klass)
         return 0;
     
-    foreach (const Method& m, klass->methods()) {
+    for (const Method& m : klass->methods()) {
         if (!(m.flags() & Method::Static) && m == meth)
             // the method m overrides meth
             return &m;
     }
     
-    foreach (const Class::BaseClassSpecifier& base, klass->baseClasses()) {
+    for (const Class::BaseClassSpecifier& base : klass->baseClasses()) {
         // we reached the class in which meth was defined and we still didn't find any overrides => return
         if (base.baseClass == meth.getClass())
             return 0;
@@ -868,7 +868,7 @@ const Method* Util::isVirtualOverriden(const Method& meth, const Class* klass)
 }
 
 static bool qListContainsMethodPointer(const QList<const Method*> list, const Method* ptr) {
-    foreach (const Method* meth, list) {
+    for (const Method* meth : list) {
         if (*meth == *ptr)
             return true;
     }
@@ -888,7 +888,7 @@ QList<const Method*> Util::virtualMethodsForClass(const Class* klass)
     
     QList<const Method*> ret;
 
-    foreach (const Method* meth, Util::collectVirtualMethods(klass)) {
+    for (const Method* meth : Util::collectVirtualMethods(klass)) {
         // this is a synthesized overload, skip it.
         if (!meth->remainingDefaultValues().isEmpty())
             continue;
@@ -915,7 +915,7 @@ QList<const Method*> Util::virtualMethodsForClass(const Class* klass)
 
 bool Options::typeExcluded(const QString& typeName)
 {
-    foreach (const QRegExp& exp, Options::excludeExpressions) {
+    for (const QRegExp& exp : Options::excludeExpressions) {
         if (exp.exactMatch(typeName))
             return true;
     }
@@ -923,7 +923,7 @@ bool Options::typeExcluded(const QString& typeName)
 }
 
 bool Options::functionNameIncluded(const QString& fnName) {
-    foreach (const QRegExp& exp, Options::includeFunctionNames) {
+    for (const QRegExp& exp : Options::includeFunctionNames) {
         if (exp.exactMatch(fnName))
             return true;
     }
@@ -931,7 +931,7 @@ bool Options::functionNameIncluded(const QString& fnName) {
 }
 
 bool Options::functionSignatureIncluded(const QString& sig) {
-    foreach (const QRegExp& exp, Options::includeFunctionNames) {
+    for (const QRegExp& exp : Options::includeFunctionNames) {
         if (exp.exactMatch(sig))
             return true;
     }

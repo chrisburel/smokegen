@@ -273,7 +273,7 @@ int main(int argc, char** argv)
             PRINT_USAGE();
             return 0;
         } else {
-            foreach (Smoke * smoke, smokeModules) {
+            for (Smoke * smoke : smokeModules) {
                 for (int i = 1; i <= smoke->numClasses; i++) {
                     if (!smoke->classes[i].external) {
                         showClass(Smoke::ModuleIndex(smoke, i), 0);
@@ -295,7 +295,7 @@ int main(int argc, char** argv)
         
         if (showParents) {
             QList<ClassEntry> parents = getAllParents(classId, 0);
-            foreach (ClassEntry parent, parents) {
+            for (ClassEntry parent : parents) {
                 showClass(parent.first, parent.second);
             }
         } else {
