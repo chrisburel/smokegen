@@ -301,6 +301,7 @@ Enum* SmokegenASTVisitor::registerEnum(const clang::EnumDecl* clangEnum) const {
     }
 
     Enum localE(
+        clangEnum->isScopedUsingClassTag(),
         name,
         nspace,
         parent

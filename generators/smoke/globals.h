@@ -92,7 +92,7 @@ private:
     void generateMethod(QTextStream& out, const QString& className, const QString& smokeClassName, const Method& meth, int index, QSet<QString>& includes, bool privateDestructor);
     void generateGetAccessor(QTextStream& out, const QString& className, const Field& field, const Type* type, int index);
     void generateSetAccessor(QTextStream& out, const QString& className, const Field& field, const Type* type, int index);
-    void generateEnumMemberCall(QTextStream& out, const QString& className, const QString& member, int index);
+    void generateEnumMemberCall(QTextStream& out, const QString& parentName, const QString& className, bool isScoped, const QString& member, int index);
     void generateVirtualMethod(QTextStream& out, const Method& meth, QSet<QString>& includes);
     
     void writeClass(QTextStream& out, const Class* klass, const QString& className, QSet<QString>& includes);

@@ -165,9 +165,10 @@ class EnumMember;
 class GENERATOR_EXPORT Enum : public BasicTypeDeclaration
 {
 public:
-    Enum(const QString& name = QString(), const QString nspace = QString(), Class* parent = 0)
-         : BasicTypeDeclaration(name, nspace, parent) {}
-    virtual ~Enum() {}
+    Enum(bool isScoped = false, const QString& name = QString(), const QString nspace = QString(), Class* parent = 0)
+         : BasicTypeDeclaration(name, nspace, parent)
+         , m_isScopedEnum(isScoped)
+    {}
 
     const QList<EnumMember>& members() const { return m_members; }
     QList<EnumMember>& membersRef() { return m_members; }
@@ -181,8 +182,13 @@ public:
         return ret;
     }
 
+    bool isScoped() const {
+        return m_isScopedEnum;
+    }
+
 private:
     QList<EnumMember> m_members;
+    bool m_isScopedEnum;
 };
 
 class GENERATOR_EXPORT Member
