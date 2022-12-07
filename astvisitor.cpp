@@ -482,7 +482,9 @@ Type* SmokegenASTVisitor::registerType(clang::QualType clangType) const {
                             }
                         }
                         if (tempArgType.name().isEmpty()) {
-                            tempArgType.setName(QString::fromStdString(args[i].getAsIntegral().toString(10)));
+                            llvm::SmallVector<char> stringifiedTemplateArg;
+                            args[i].getAsIntegral().toString(stringifiedTemplateArg, 10);
+                            tempArgType.setName(QString::fromLocal8Bit(stringifiedTemplateArg.data(), stringifiedTemplateArg.size()));
                         }
                         type.appendTemplateArgument(tempArgType);
                         break;
