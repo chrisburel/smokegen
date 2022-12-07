@@ -4,10 +4,12 @@ project(smokegenerator)
 find_package(Qt5 COMPONENTS Core Xml REQUIRED)
 
 find_package(LLVM REQUIRED CONFIG)
+find_package(Clang REQUIRED CONFIG)
 link_directories(${LLVM_LIBRARY_DIRS})
 
 message(STATUS "Found LLVM ${LLVM_PACKAGE_VERSION}")
 message(STATUS "Using LLVMConfig.cmake in: ${LLVM_DIR}")
+message(STATUS "Using ClangConfig.cmake in: ${Clang_DIR}")
 
 list(APPEND CMAKE_MODULE_PATH ${LLVM_CMAKE_DIR})
 include(AddLLVM)
@@ -81,7 +83,6 @@ llvm_map_components_to_libnames(
 target_link_libraries(smokegen
     Qt5::Core
     Qt5::Xml
-    -Wl,--start-group
     clangAST
     clangAnalysis
     clangBasic
@@ -102,7 +103,6 @@ target_link_libraries(smokegen
     clangSerialization
     clangToolingCore
     clangTooling
-    -Wl,--end-group
     ${llvm_libs}
 )
 
