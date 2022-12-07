@@ -10,5 +10,5 @@ SmokegenFrontendAction::CreateASTConsumer(clang::CompilerInstance &CI, clang::St
     CI.getFrontendOpts().SkipFunctionBodies = true;
     CI.getDiagnostics().setSeverity(clang::diag::warn_undefined_inline, clang::diag::Severity::Ignored, clang::SourceLocation());
 
-    return llvm::make_unique<SmokegenASTConsumer>(CI);
+    return std::make_unique<SmokegenASTConsumer>(CI);
 }
