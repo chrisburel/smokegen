@@ -256,7 +256,7 @@ int main(int argc, char **argv)
         clang::FileManager FM({"."}, overlayFS);
         FM.Retain();
 
-        clang::tooling::ToolInvocation inv(Argv, new SmokegenFrontendAction, &FM);
+        clang::tooling::ToolInvocation inv(Argv, std::make_unique<SmokegenFrontendAction>(), &FM);
 
         if (!inv.run()) {
             return 1;
